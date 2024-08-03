@@ -1,193 +1,257 @@
 <!DOCTYPE html>
 <html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="Anthor" content="Pritam Debnath" />
+    <meta
+      name="LinkedIn"
+      content="https://www.linkedin.com/in/pritam-debnath-762019239/"
+    />
+    <meta name="GitHub" content="https://github.com/PriDebnath" />
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
- <meta name="Anthor" content="Pritam Debnath">
- <meta name="LinkedIn" content="https://www.linkedin.com/in/pritam-debnath-762019239/">
-  <meta name="GitHub" content="https://github.com/PriDebnath">
+    <title>It's you</title>
 
-  <title>It's you </title>
-  
-  <style>
-    body {
-      margin: 0;
-      overflow: hidden;
-    }
-    canvas {
-      display: block;
-      width: 100%;
-    }
-  </style>
-</head>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+      }
+      canvas {
+        display: block;
+        width: 100%;
+      }
+    </style>
+  </head>
 
-<body>
-  <canvas id="canvas"></canvas>
-  
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.js"></script>
-  <script>
-  // Images
-  let yourImage = './images/you.jpg'
-  let bgImage = './images/space.jpg'
-  let textureImage = './images/texture.jpg'
-    // Setup
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({
-      canvas: document.querySelector('#canvas'),
-    });
+  <body>
+    <canvas id="canvas"></canvas>
 
-    renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    camera.position.z = 20;
-
-    // Lights
-    const pointLight = new THREE.PointLight('red');
-    pointLight.position.set(115, 115, 15);
-    const ambientLight = new THREE.AmbientLight('white');
-    scene.add(pointLight, ambientLight);
-
-    // Background
-    const spaceTexture = new THREE.TextureLoader().load(bgImage);
-    scene.background = spaceTexture;
-
-    const stars = [];
-    function addBlinkingStar() {
-      const geometry = new THREE.SphereGeometry(0.5, 24, 24);
-     let skyblue = '#C9FDFF'
-      const material = new THREE.MeshBasicMaterial({ color: skyblue, transparent: true });
-      const star = new THREE.Mesh(geometry, material);
-
-      const [x, y, z] = Array(3).fill().map(() => THREE.MathUtils.randFloatSpread(200));
-
-      star.position.set(x, y, z);
-      scene.add(star);
-
-      // Random velocity
-      const velocity = new THREE.Vector3(
-        THREE.MathUtils.randFloat(-0.006, 0.002),
-        THREE.MathUtils.randFloat(-0.006, 0.002),
-        THREE.MathUtils.randFloat(-0.006, 0.002)
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.js"></script>
+    <script>
+      // Images
+      let yourImage = "./images/you.jpg";
+      let bgImage = "./images/space.jpg";
+      let textureImage = "./images/texture.jpg";
+      // Setup
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(
+        75,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000
       );
+      const renderer = new THREE.WebGLRenderer({
+        canvas: document.querySelector("#canvas"),
+      });
 
-      // Unique blinking phase
-      const blinkPhase = Math.random() * 5; 
+      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      camera.position.z = 20;
 
-      stars.push({ star, velocity, blinkPhase });
-    }
+      // Lights
+      const pointLight = new THREE.PointLight("red");
+      pointLight.position.set(115, 115, 15);
+      const ambientLight = new THREE.AmbientLight("white");
+      scene.add(pointLight, ambientLight);
 
-    Array(1000).fill().forEach(addBlinkingStar);
+      // Background
+      const spaceTexture = new THREE.TextureLoader().load(bgImage);
+      scene.background = spaceTexture;
 
-    // Moon
-    const moonTexture = new THREE.TextureLoader().load(yourImage);
-    const normalTexture = new THREE.TextureLoader().load(textureImage);
-    const you = new THREE.Mesh(
-      new THREE.SphereGeometry(3, 32, 32),
-      new THREE.MeshStandardMaterial({
-        map: moonTexture,
-        normalMap: normalTexture,
-      })
-    );
-    scene.add(you);
-    you.position.z = -10;
+      const stars = [];
+      function addBlinkingStar() {
+        const geometry = new THREE.SphereGeometry(0.5, 24, 24);
+        let skyblue = "#C9FDFF";
+        const material = new THREE.MeshBasicMaterial({
+          color: skyblue,
+          transparent: true,
+        });
+        const star = new THREE.Mesh(geometry, material);
 
-    // Swipe Interaction
-    let touchStartX = 0;
-    let touchStartY = 0;
-    let lastTouchX = 0;
-    let lastTouchY = 0;
-    let rotationVelocityX = 0;
-    let rotationVelocityY = 0;
-    const momentumDecay = 0.998;
-    let interactingWithMoon = false;
+        const [x, y, z] = Array(3)
+          .fill()
+          .map(() => THREE.MathUtils.randFloatSpread(200));
 
-    function handleTouchStart(event) {
-      if (event.touches.length === 1) {
-        touchStartX = event.touches[0].clientX;
-        touchStartY = event.touches[0].clientY;
+        star.position.set(x, y, z);
+        scene.add(star);
+
+        // Random velocity
+        const velocity = new THREE.Vector3(
+          THREE.MathUtils.randFloat(-0.006, 0.002),
+          THREE.MathUtils.randFloat(-0.006, 0.002),
+          THREE.MathUtils.randFloat(-0.006, 0.002)
+        );
+
+        // Unique blinking phase
+        const blinkPhase = Math.random() * 5;
+
+        stars.push({ star, velocity, blinkPhase });
+      }
+
+      Array(1000).fill().forEach(addBlinkingStar);
+
+      // Moon
+      const moonTexture = new THREE.TextureLoader().load(yourImage);
+      const normalTexture = new THREE.TextureLoader().load(textureImage);
+      const you = new THREE.Mesh(
+        new THREE.SphereGeometry(3, 32, 32),
+        new THREE.MeshStandardMaterial({
+          map: moonTexture,
+          normalMap: normalTexture,
+        })
+      );
+      scene.add(you);
+      you.position.z = -10;
+
+      // **Swipe and Drag Interaction**
+      let touchStartX = 0;
+      let touchStartY = 0;
+      let lastTouchX = 0;
+      let lastTouchY = 0;
+      let rotationVelocityX = 0;
+      let rotationVelocityY = 0;
+      const momentumDecay = 0.998;
+      let interactingWithMoon = false;
+
+      function handleInteractionStart(clientX, clientY) {
+        touchStartX = clientX;
+        touchStartY = clientY;
         lastTouchX = touchStartX;
         lastTouchY = touchStartY;
 
-        const touchPosition = new THREE.Vector3(
+        const interactionPosition = new THREE.Vector3(
           (touchStartX / window.innerWidth) * 2 - 1,
-          - (touchStartY / window.innerHeight) * 2 + 1,
+          -(touchStartY / window.innerHeight) * 2 + 1,
           0.5
         );
-        touchPosition.unproject(camera);
+        interactionPosition.unproject(camera);
 
-        const raycaster = new THREE.Raycaster(camera.position, touchPosition.sub(camera.position).normalize());
+        const raycaster = new THREE.Raycaster(
+          camera.position,
+          interactionPosition.sub(camera.position).normalize()
+        );
         const intersects = raycaster.intersectObject(you);
         interactingWithMoon = intersects.length > 0;
       }
-    }
 
-    function handleTouchMove(event) {
-      if (event.touches.length === 1) {
-        const touchEndX = event.touches[0].clientX;
-        const touchEndY = event.touches[0].clientY;
-        const dx = touchEndX - lastTouchX;
-        const dy = touchEndY - lastTouchY;
+      function handleInteractionMove(clientX, clientY) {
+        const dx = clientX - lastTouchX;
+        const dy = clientY - lastTouchY;
 
         if (interactingWithMoon) {
-          you.rotation.y += dx * 0.0005;
-          you.rotation.x += dy * 0.0005;
-          rotationVelocityX = dx * 0.0001;
-          rotationVelocityY = dy * 0.0001;
+          // Rotate moon
+          you.rotation.y += dx * 0.005;
+          you.rotation.x += dy * 0.005;
+          rotationVelocityX = dx * 0.001;
+          rotationVelocityY = dy * 0.001;
         } else {
-          const angle = Math.sqrt(dx * dx + dy * dy) * 0.01;
-          camera.position.applyMatrix4(new THREE.Matrix4().makeRotationY(dx * 0.005));
-          camera.position.applyMatrix4(new THREE.Matrix4().makeRotationX(dy * 0.005));
+          // Move camera view
+          camera.position.applyMatrix4(
+            new THREE.Matrix4().makeRotationY(dx * 0.005)
+          );
+          camera.position.applyMatrix4(
+            new THREE.Matrix4().makeRotationX(dy * 0.005)
+          );
           camera.lookAt(you.position);
-          lastTouchX = touchEndX;
-          lastTouchY = touchEndY;
         }
+
+        lastTouchX = clientX;
+        lastTouchY = clientY;
       }
-    }
 
-    function handleTouchEnd(event) {
-      if (interactingWithMoon) {
-        function applyMomentum() {
-          you.rotation.y += rotationVelocityX;
-          you.rotation.x += rotationVelocityY;
-          rotationVelocityX *= momentumDecay;
-          rotationVelocityY *= momentumDecay;
+      function handleInteractionEnd() {
+        if (interactingWithMoon) {
+          function applyMomentum() {
+            you.rotation.y += rotationVelocityX;
+            you.rotation.x += rotationVelocityY;
+            rotationVelocityX *= momentumDecay;
+            rotationVelocityY *= momentumDecay;
 
-          if (Math.abs(rotationVelocityX) > 0.001 || Math.abs(rotationVelocityY) > 0.001) {
-            requestAnimationFrame(applyMomentum);
+            if (
+              Math.abs(rotationVelocityX) > 0.001 ||
+              Math.abs(rotationVelocityY) > 0.001
+            ) {
+              requestAnimationFrame(applyMomentum);
+            }
           }
+
+          applyMomentum();
         }
-
-        applyMomentum();
       }
-    }
 
-    document.addEventListener('touchstart', handleTouchStart, false);
-    document.addEventListener('touchmove', handleTouchMove, false);
-    document.addEventListener('touchend', handleTouchEnd, false);
+      // **New: Touch Event Handlers**
+      document.addEventListener(
+        "touchstart",
+        (event) => {
+          if (event.touches.length === 1) {
+            handleInteractionStart(
+              event.touches[0].clientX,
+              event.touches[0].clientY
+            );
+          }
+        },
+        false
+      );
 
-    // Animation Loop
-    function animate() {
-      requestAnimationFrame(animate);
+      document.addEventListener(
+        "touchmove",
+        (event) => {
+          if (event.touches.length === 1) {
+            handleInteractionMove(
+              event.touches[0].clientX,
+              event.touches[0].clientY
+            );
+          }
+        },
+        false
+      );
 
-      stars.forEach(({ star, velocity, blinkPhase }) => {
-        star.position.add(velocity);
+      document.addEventListener("touchend", handleInteractionEnd, false);
 
-        // Bounce off the edges
-        if (star.position.x > 100 || star.position.x < -100) velocity.x *= -1;
-        if (star.position.y > 100 || star.position.y < -100) velocity.y *= -1;
-        if (star.position.z > 100 || star.position.z < -100) velocity.z *= -1;
+      // **New: Mouse Event Handlers**
+      document.addEventListener(
+        "mousedown",
+        (event) => {
+          handleInteractionStart(event.clientX, event.clientY);
+        },
+        false
+      );
 
-        // Blinking effect with unique phase
-        const time = Date.now() * 0.001 + blinkPhase;
-        star.material.opacity = (Math.sin(time) + 1) / 2; // Blinking effect
-      });
+      document.addEventListener(
+        "mousemove",
+        (event) => {
+          if (event.buttons === 1) {
+            // Check if left mouse button is pressed
+            handleInteractionMove(event.clientX, event.clientY);
+          }
+        },
+        false
+      );
 
-      renderer.render(scene, camera);
-    }
+      document.addEventListener("mouseup", handleInteractionEnd, false);
 
-    animate();
-  </script>
-</body>
+      // Animation Loop
+      function animate() {
+        requestAnimationFrame(animate);
 
+        stars.forEach(({ star, velocity, blinkPhase }) => {
+          star.position.add(velocity);
+
+          // Bounce off the edges
+          if (star.position.x > 100 || star.position.x < -100) velocity.x *= -1;
+          if (star.position.y > 100 || star.position.y < -100) velocity.y *= -1;
+          if (star.position.z > 100 || star.position.z < -100) velocity.z *= -1;
+
+          // Blinking effect with unique phase
+          const time = Date.now() * 0.001 + blinkPhase;
+          star.material.opacity = (Math.sin(time) + 1) / 2; // Blinking effect
+        });
+
+        renderer.render(scene, camera);
+      }
+
+      animate();
+    </script>
+  </body>
 </html>
