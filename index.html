@@ -104,7 +104,7 @@
       scene.add(you);
       you.position.z = -10;
 
-      // Swipe Interaction
+      // **Swipe and Drag Interaction**
       let touchStartX = 0;
       let touchStartY = 0;
       let lastTouchX = 0;
@@ -114,57 +114,53 @@
       const momentumDecay = 0.998;
       let interactingWithMoon = false;
 
-      function handleTouchStart(event) {
-        if (event.touches.length === 1) {
-          touchStartX = event.touches[0].clientX;
-          touchStartY = event.touches[0].clientY;
-          lastTouchX = touchStartX;
-          lastTouchY = touchStartY;
+      function handleInteractionStart(clientX, clientY) {
+        touchStartX = clientX;
+        touchStartY = clientY;
+        lastTouchX = touchStartX;
+        lastTouchY = touchStartY;
 
-          const touchPosition = new THREE.Vector3(
-            (touchStartX / window.innerWidth) * 2 - 1,
-            -(touchStartY / window.innerHeight) * 2 + 1,
-            0.5
-          );
-          touchPosition.unproject(camera);
+        const interactionPosition = new THREE.Vector3(
+          (touchStartX / window.innerWidth) * 2 - 1,
+          -(touchStartY / window.innerHeight) * 2 + 1,
+          0.5
+        );
+        interactionPosition.unproject(camera);
 
-          const raycaster = new THREE.Raycaster(
-            camera.position,
-            touchPosition.sub(camera.position).normalize()
-          );
-          const intersects = raycaster.intersectObject(you);
-          interactingWithMoon = intersects.length > 0;
-        }
+        const raycaster = new THREE.Raycaster(
+          camera.position,
+          interactionPosition.sub(camera.position).normalize()
+        );
+        const intersects = raycaster.intersectObject(you);
+        interactingWithMoon = intersects.length > 0;
       }
 
-      function handleTouchMove(event) {
-        if (event.touches.length === 1) {
-          const touchEndX = event.touches[0].clientX;
-          const touchEndY = event.touches[0].clientY;
-          const dx = touchEndX - lastTouchX;
-          const dy = touchEndY - lastTouchY;
+      function handleInteractionMove(clientX, clientY) {
+        const dx = clientX - lastTouchX;
+        const dy = clientY - lastTouchY;
 
-          if (interactingWithMoon) {
-            you.rotation.y += dx * 0.0005;
-            you.rotation.x += dy * 0.0005;
-            rotationVelocityX = dx * 0.0001;
-            rotationVelocityY = dy * 0.0001;
-          } else {
-            const angle = Math.sqrt(dx * dx + dy * dy) * 0.01;
-            camera.position.applyMatrix4(
-              new THREE.Matrix4().makeRotationY(dx * 0.005)
-            );
-            camera.position.applyMatrix4(
-              new THREE.Matrix4().makeRotationX(dy * 0.005)
-            );
-            camera.lookAt(you.position);
-            lastTouchX = touchEndX;
-            lastTouchY = touchEndY;
-          }
+        if (interactingWithMoon) {
+          // Rotate moon
+          you.rotation.y += dx * 0.005;
+          you.rotation.x += dy * 0.005;
+          rotationVelocityX = dx * 0.001;
+          rotationVelocityY = dy * 0.001;
+        } else {
+          // Move camera view
+          camera.position.applyMatrix4(
+            new THREE.Matrix4().makeRotationY(dx * 0.005)
+          );
+          camera.position.applyMatrix4(
+            new THREE.Matrix4().makeRotationX(dy * 0.005)
+          );
+          camera.lookAt(you.position);
         }
+
+        lastTouchX = clientX;
+        lastTouchY = clientY;
       }
 
-      function handleTouchEnd(event) {
+      function handleInteractionEnd() {
         if (interactingWithMoon) {
           function applyMomentum() {
             you.rotation.y += rotationVelocityX;
@@ -184,9 +180,56 @@
         }
       }
 
-      document.addEventListener("touchstart", handleTouchStart, false);
-      document.addEventListener("touchmove", handleTouchMove, false);
-      document.addEventListener("touchend", handleTouchEnd, false);
+      // **New: Touch Event Handlers**
+      document.addEventListener(
+        "touchstart",
+        (event) => {
+          if (event.touches.length === 1) {
+            handleInteractionStart(
+              event.touches[0].clientX,
+              event.touches[0].clientY
+            );
+          }
+        },
+        false
+      );
+
+      document.addEventListener(
+        "touchmove",
+        (event) => {
+          if (event.touches.length === 1) {
+            handleInteractionMove(
+              event.touches[0].clientX,
+              event.touches[0].clientY
+            );
+          }
+        },
+        false
+      );
+
+      document.addEventListener("touchend", handleInteractionEnd, false);
+
+      // **New: Mouse Event Handlers**
+      document.addEventListener(
+        "mousedown",
+        (event) => {
+          handleInteractionStart(event.clientX, event.clientY);
+        },
+        false
+      );
+
+      document.addEventListener(
+        "mousemove",
+        (event) => {
+          if (event.buttons === 1) {
+            // Check if left mouse button is pressed
+            handleInteractionMove(event.clientX, event.clientY);
+          }
+        },
+        false
+      );
+
+      document.addEventListener("mouseup", handleInteractionEnd, false);
 
       // Animation Loop
       function animate() {
