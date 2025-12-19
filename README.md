@@ -2,6 +2,6 @@
 
 <div style="width:100%;">
 <a href="https://pridebnath.github.io/you/">
-<img src = "./images/demo.jpg" />
+<img height='480' src = "./images/demo.jpg" />
 </a>
 </div>
